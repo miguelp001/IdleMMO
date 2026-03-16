@@ -1,0 +1,82 @@
+.App {
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+}
+
+/* Custom scrollbar for the entire app */
+.App::-webkit-scrollbar {
+  width: 8px;
+}
+
+.App::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.App::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.App::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Loading animation */
+.loading-spinner {
+  border: 4px solid #334155;
+  border-top: 4px solid #0ea5e9;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Fade in animation for components */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pulse animation for important elements */
+.pulse-important {
+  animation: pulseImportant 2s ease-in-out infinite;
+}
+
+@keyframes pulseImportant {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Glow effect for legendary items */
+.glow-legendary {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation: glowLegendary 2s ease-in-out infinite alternate;
+}
+
+@keyframes glowLegendary {
+  from { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+  to { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .App {
+    padding: 5px;
+  }
+} 

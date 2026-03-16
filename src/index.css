@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Orbitron', monospace;
+  }
+  
+  body {
+    @apply bg-dark-950 text-dark-100;
+  }
+}
+
+@layer components {
+  .game-card {
+    @apply bg-dark-800 border border-dark-600 rounded-lg p-4 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .game-button {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-800;
+  }
+  
+  .game-button-secondary {
+    @apply bg-dark-700 hover:bg-dark-600 text-dark-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-dark-500 focus:ring-offset-2 focus:ring-offset-dark-800;
+  }
+  
+  .stat-bar {
+    @apply bg-dark-700 rounded-full h-2 overflow-hidden;
+  }
+  
+  .stat-fill {
+    @apply h-full transition-all duration-500 ease-out;
+  }
+  
+  .rarity-common {
+    @apply text-gray-300;
+  }
+  
+  .rarity-uncommon {
+    @apply text-green-400;
+  }
+  
+  .rarity-rare {
+    @apply text-blue-400;
+  }
+  
+  .rarity-epic {
+    @apply text-purple-400;
+  }
+  
+  .rarity-legendary {
+    @apply text-fantasy-gold;
+  }
+  
+  .tooltip {
+    @apply absolute z-50 px-3 py-2 text-sm text-white bg-dark-900 border border-dark-600 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-200;
+  }
+  
+  .tooltip.show {
+    @apply opacity-100;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .bg-gradient-fantasy {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+  
+  .border-glow {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+} 
