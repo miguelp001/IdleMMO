@@ -5,6 +5,7 @@ import { useGameTimer } from '../hooks/useGameTimer';
 import { useSaveSystem } from '../hooks/useSaveSystem';
 import { useNotificationSystem } from '../hooks/useNotificationSystem';
 import { generateInitialGameState } from '../utils/gameInitializer';
+import { getGlobalModifiers, getFactionModifiers } from '../services/worldEventService';
 
 interface GameContextType {
   state: GameState;
@@ -93,7 +94,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       duration: 30000, // 30 seconds
       remaining: 30000,
       callback: () => {
-        dispatch({ type: 'PROCESS_WORLD_EVENTS' });
+        dispatch({ type: 'ADVANCE_WORLD_STATE' });
       },
       isActive: true,
       isRepeating: true,

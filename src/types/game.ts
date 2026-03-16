@@ -257,16 +257,21 @@ export interface LocationRequirements {
   items?: string[];
 }
 
+export type WorldEventType = 'economic' | 'combat' | 'favorable' | 'catastrophe' | 'social' | 'festival' | 'invasion' | 'discovery' | 'disaster';
+
 export interface WorldEvent {
   id: string;
   name: string;
   description: string;
-  type: 'festival' | 'invasion' | 'discovery' | 'disaster';
-  duration: number;
-  startTime: Date;
-  endTime: Date;
-  effects: WorldEventEffect[];
-  rewards: WorldEventReward[];
+  type: WorldEventType;
+  modifiers: {
+    shopPrices?: number;
+    monsterStats?: number;
+    xpGain?: number;
+    goldGain?: number;
+    relationshipGain?: number;
+  };
+  duration: number; // in days
 }
 
 export interface WorldEventEffect {
@@ -521,9 +526,11 @@ export interface WorldState {
   day: number;
   season: 'spring' | 'summer' | 'autumn' | 'winter';
   weather: 'clear' | 'rain' | 'storm' | 'snow';
-  activeEvents: string[];
+  activeEvents: WorldEvent[];
   globalEffects: WorldEventEffect[];
   economy: EconomyState;
+  factionStandings: Record<string, number>;
+  globalGoldMultiplier: number;
 }
 
 export interface EconomyState {

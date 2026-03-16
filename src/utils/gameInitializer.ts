@@ -43,6 +43,12 @@ export const generateInitialGameState = (): GameState => {
         itemPrices: {},
         marketTrends: {},
       },
+      factionStandings: {
+        'Trade_Consortium': 0,
+        'Warrior_Keep': 0,
+        'Explorer_League': 0
+      },
+      globalGoldMultiplier: 1.0,
     },
     achievements: [],
     settings: {

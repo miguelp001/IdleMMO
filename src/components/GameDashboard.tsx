@@ -10,8 +10,9 @@ import { GuildPanel } from './GuildPanel';
 import { CombatSystem } from './CombatSystem';
 import { SaveLoadManager } from './SaveLoadManager';
 import { BlacksmithForge } from './BlacksmithForge';
+import WorldStatusView from './WorldStatusView';
 
-type GameTab = 'character' | 'inventory' | 'dungeon' | 'family' | 'guild' | 'combat' | 'forge' | 'save';
+type GameTab = 'character' | 'inventory' | 'dungeon' | 'family' | 'guild' | 'combat' | 'forge' | 'world' | 'save';
 
 const tabs: Array<{
   id: GameTab;
@@ -27,6 +28,7 @@ const tabs: Array<{
   { id: 'combat', name: 'Combat', icon: '⚡', description: 'Active combat interface' },
   { id: 'forge', name: 'Forge', icon: '⚒️', description: 'Custom equipment forging' },
   { id: 'save', name: 'Save', icon: '💾', description: 'Save and load game data' },
+  { id: 'world', name: 'World', icon: '🌎', description: 'View global events and factions' },
 ];
 
 export const GameDashboard: React.FC = () => {
@@ -58,6 +60,8 @@ export const GameDashboard: React.FC = () => {
         return <BlacksmithForge />;
       case 'save':
         return <SaveLoadManager />;
+      case 'world':
+        return <WorldStatusView />;
       default:
         return <CharacterSheet />;
     }

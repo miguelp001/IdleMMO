@@ -88,6 +88,7 @@ export type GameAction =
   | { type: 'START_BLACKSMITH_ORDER'; payload: BlacksmithOrder }
   | { type: 'CANCEL_BLACKSMITH_ORDER'; payload: string }
   | { type: 'CLAIM_BLACKSMITH_ORDER'; payload: string }
+  | { type: 'ADVANCE_WORLD_STATE' }
   | { type: 'TICK_BLACKSMITH_ORDERS'; payload: number };
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
@@ -408,8 +409,15 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         },
       };
 
-      // Handle material drops on enemy defeat
+      // Handle material drops and rewards on enemy defeat
       if (enemyDefeated && state.activeCharacterId) {
+        const { getGlobalModifiers, getFactionModifiers } = require('../services/worldEventService');
+        const globalMods = getGlobalModifiers(state.worldState.activeEvents);
+        const factionMods = getFactionModifiers(state.worldState.factionStandings);
+
+        const xpReward = Math.round(enemy.experience * globalMods.xpGain * factionMods.xpGain);
+        const goldReward = Math.round(enemy.gold * globalMods.goldGain * factionMods.goldGain);
+
         const drops: Item[] = [];
         const roll = Math.random();
         
@@ -421,20 +429,30 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
           drops.push({ ...MATERIALS.IRON_SCRAP, id: generateId() });
         }
 
-        if (drops.length > 0) {
-          drops.forEach(item => {
-            // @ts-ignore - using a simplified way to call the reducer logic internally or just modify state
-            const charIndex = newState.characters.findIndex(c => c.id === state.activeCharacterId);
-            if (charIndex !== -1) {
-              const char = newState.characters[charIndex];
-              const existingItem = char.inventory.find(invItem => invItem.id === item.id || (invItem.name === item.name && invItem.stackable));
+        const charIndex = newState.characters.findIndex(c => c.id === state.activeCharacterId);
+        if (charIndex !== -1) {
+          const char = { ...newState.characters[charIndex] };
+          char.gold += goldReward;
+          char.experience += xpReward;
+          
+          // XP/Leveling logic
+          char.experienceToNext = (char.level * 100) - char.experience;
+          if (char.experienceToNext <= 0) {
+              char.level += 1;
+              char.experienceToNext = (char.level * 100);
+          }
+
+          if (drops.length > 0) {
+            drops.forEach(item => {
+              const existingItem = char.inventory.find(invItem => invItem.name === item.name && invItem.stackable);
               if (existingItem) {
                 existingItem.quantity += 1;
               } else {
                 char.inventory.push(item);
               }
-            }
-          });
+            });
+          }
+          newState.characters[charIndex] = char;
         }
       }
 
@@ -467,9 +485,63 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       };
     }
 
+    case 'ADVANCE_WORLD_STATE': {
+      const { updateActiveEvents, rollForNewEvent } = require('../services/worldEventService');
+      
+      let nextEvents = updateActiveEvents(state.worldState.activeEvents);
+      const newEvent = rollForNewEvent(state.worldState.day);
+      if (newEvent) nextEvents.push(newEvent);
+
+      // Simple world charity: redistributing excess gold if global multiplier is high
+      let nextGoldMultiplier = state.worldState.globalGoldMultiplier;
+      if (nextGoldMultiplier > 1.5) {
+          nextGoldMultiplier *= 0.95; // Decay
+      }
+
+      return {
+          ...state,
+          worldState: {
+              ...state.worldState,
+              activeEvents: nextEvents,
+              day: state.worldState.day + 1,
+              globalGoldMultiplier: nextGoldMultiplier
+          }
+      };
+    }
+
     case 'PROCESS_WORLD_EVENTS': {
-      // Process world events logic
+      // Periodic check for world event triggers
+      // In this architecture, it might be called every tick or periodically
       return state;
+    }
+
+    case 'COMPLETE_QUEST': {
+      const { characterId, questId } = action.payload;
+      return {
+        ...state,
+        characters: state.characters.map(char => {
+          if (char.id === characterId) {
+            const quest = char.quests.find(q => q.id === questId);
+            if (quest) {
+              // Add reputation based on quest rewards or defaults
+              const repGain = 10;
+              const nextReputation = { ...char.reputation };
+              
+              // For now, simple logic: if it's a social quest, give general rep
+              const factionId = (quest as any).factionId || 'General';
+              nextReputation[factionId] = (nextReputation[factionId] || 0) + repGain;
+
+              return {
+                ...char,
+                quests: char.quests.map(q => q.id === questId ? { ...q, isCompleted: true, isActive: false } : q),
+                reputation: nextReputation,
+                lastActive: new Date(),
+              };
+            }
+          }
+          return char;
+        }),
+      };
     }
 
     case 'UPDATE_SETTINGS': {
